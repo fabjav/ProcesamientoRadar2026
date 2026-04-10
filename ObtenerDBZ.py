@@ -4,7 +4,7 @@ from PIL import Image
 import numpy as np
 from datetime import datetime, timedelta
 
-# 🔹 Mapeo color → dBZ (RGB)
+# mapeo color → dBZ (RGB)
 niveles_dbz = {
     (66, 63, 140): 10,
     (0, 88, 5): 20,
@@ -24,10 +24,9 @@ niveles_dbz = {
     (212, 212, 212): 80
 }
 
-# 🔹 Invertir diccionario (dBZ → color)
+# invertir diccionario (dBZ → color)
 dbz_a_color = {v: k for k, v in niveles_dbz.items()}
-
-# 🔹 Función: color más cercano
+#color mas cercano
 def color_mas_cercano(color, mapa, umbral=500):
     min_dist = float("inf")
     mejor_valor = 0
@@ -44,7 +43,7 @@ def color_mas_cercano(color, mapa, umbral=500):
 
     return mejor_valor
 
-# 🔹 Relleno de huecos (marca de agua)
+# relleno de huecos 
 def rellenar_huecos(matriz):
     alto = len(matriz)
     ancho = len(matriz[0])
@@ -71,7 +70,7 @@ def rellenar_huecos(matriz):
 
     return nueva
 
-# 🔹 Carpetas
+# carpetas
 input_dir = "recortadas"
 output_img_dir = "imagen_dbz"
 output_csv_dir = "matrices_dbz"
@@ -79,13 +78,13 @@ output_csv_dir = "matrices_dbz"
 os.makedirs(output_img_dir, exist_ok=True)
 os.makedirs(output_csv_dir, exist_ok=True)
 
-# 🔹 Nombre corregido
+# nombre archivo
 def obtener_nombre(fecha_str, hora_str):
     dt = datetime.strptime(fecha_str + hora_str, "%Y%m%d%H%M")
     dt = dt - timedelta(hours=3, minutes=2)
     return dt.strftime("mendoza_%Y%m%d_%H%M")
 
-# 🔹 Procesamiento
+# procesamiento
 for archivo in os.listdir(input_dir):
 
     if not archivo.endswith(".gif"):
@@ -109,7 +108,7 @@ for archivo in os.listdir(input_dir):
 
         matriz_dbz = []
 
-        # 🔹 1. Construcción matriz dBZ
+        # construcción matriz dBZ
         for y in range(alto):
             fila = []
             for x in range(ancho):
@@ -121,7 +120,7 @@ for archivo in os.listdir(input_dir):
 
             matriz_dbz.append(fila)
 
-        # 🔥 2. Relleno (AHORA 20 PASADAS)
+        # relleno con 20 iteraciones
         for _ in range(20):
             nueva = rellenar_huecos(matriz_dbz)
 
@@ -130,7 +129,7 @@ for archivo in os.listdir(input_dir):
 
             matriz_dbz = nueva
 
-        # 🔹 3. Reconstrucción imagen
+        # reconstrucción imagen
         img_dbz = Image.new("RGB", (ancho, alto))
 
         for y in range(alto):
@@ -161,4 +160,4 @@ for archivo in os.listdir(input_dir):
     except Exception as e:
         print(f"Error con {archivo}: {e}")
 
-print("✅ Procesamiento terminado.")
+print("Procesamiento terminado.")

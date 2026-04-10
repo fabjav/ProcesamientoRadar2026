@@ -1,14 +1,14 @@
 import os
 from PIL import Image
 
-# --- Configuración de carpetas ---
+
 carpeta_entrada = "radar_mendoza"
 carpeta_salida = "recortadas"
 
-# Crear carpeta de salida si no existe
+
 os.makedirs(carpeta_salida, exist_ok=True)
 
-# --- Medidas del recorte ---
+
 medida = {
     "izq": 5,
     "derecha": 146,
@@ -16,7 +16,7 @@ medida = {
     "abajo": 29
 }
 
-# --- Función para recortar una imagen ---
+# recortar imagen
 def recortar_imagen(imagen):
     ancho, alto = imagen.size
     x_inicio = medida["izq"]
@@ -28,7 +28,7 @@ def recortar_imagen(imagen):
     nueva_imagen = imagen.crop((x_inicio, y_inicio, x_fin, y_fin))
     return nueva_imagen
 
-# --- Procesar todas las imágenes de la carpeta ---
+# procesar todas las imágenes de la carpeta 
 for archivo in os.listdir(carpeta_entrada):
     # Solo archivos .gif
     if not archivo.lower().endswith(".gif"):
@@ -37,12 +37,12 @@ for archivo in os.listdir(carpeta_entrada):
     ruta_entrada = os.path.join(carpeta_entrada, archivo)
     ruta_salida = os.path.join(carpeta_salida, archivo)
 
-    # Evitar duplicados
+    # evitar duplicados
     if os.path.exists(ruta_salida):
         print(f"Ya existe: {archivo}, saltando...")
         continue
 
-    # Abrimos, recortamos y guardamos
+    # abrir recortar y guardar
     imagen = Image.open(ruta_entrada)
     imagen_recortada = recortar_imagen(imagen)
     imagen_recortada.save(ruta_salida)
