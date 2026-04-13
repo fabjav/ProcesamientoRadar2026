@@ -26,7 +26,8 @@ niveles_dbz = {
 
 # invertir diccionario (dBZ → color)
 dbz_a_color = {v: k for k, v in niveles_dbz.items()}
-#color mas cercano
+
+# color más cercano
 def color_mas_cercano(color, mapa, umbral=500):
     min_dist = float("inf")
     mejor_valor = 0
@@ -64,7 +65,6 @@ def rellenar_huecos(matriz):
                         if matriz[ni][nj] != 0:
                             vecinos.append(matriz[ni][nj])
 
-                # 🔥 condición (ajustable)
                 if len(vecinos) >= 2:
                     nueva[i][j] = int(sum(vecinos) / len(vecinos))
 
@@ -112,42 +112,43 @@ for archivo in os.listdir(input_dir):
         for y in range(alto):
             fila = []
             for x in range(ancho):
-
                 color = img.getpixel((x, y))
                 valor = color_mas_cercano(color, niveles_dbz)
-
                 fila.append(valor)
-
             matriz_dbz.append(fila)
 
         # relleno con 20 iteraciones
         for _ in range(20):
             nueva = rellenar_huecos(matriz_dbz)
-
             if nueva == matriz_dbz:
                 break
-
             matriz_dbz = nueva
 
-        # reconstrucción imagen
-        img_dbz = Image.new("RGB", (ancho, alto))
+        # 🔥 reconstrucción imagen con transparencia
+        img_dbz = Image.new("RGBA", (ancho, alto))
 
         for y in range(alto):
             for x in range(ancho):
 
                 valor = matriz_dbz[y][x]
 
-                if valor in dbz_a_color:
-                    img_dbz.putpixel((x, y), dbz_a_color[valor])
+                if valor == 0:
+                    # transparente
+                    img_dbz.putpixel((x, y), (0, 0, 0, 0))
+
+                elif valor in dbz_a_color:
+                    r, g, b = dbz_a_color[valor]
+                    img_dbz.putpixel((x, y), (r, g, b, 255))
+
                 else:
-                    img_dbz.putpixel((x, y), (0, 0, 0))
+                    img_dbz.putpixel((x, y), (0, 0, 0, 0))
 
         matriz_np = np.array(matriz_dbz)
 
-        # 🔹 Guardar imagen
+        # guardar imagen PNG (con alfa)
         img_dbz.save(os.path.join(output_img_dir, nombre_base + ".png"))
 
-        # 🔹 Guardar CSV
+        # guardar CSV
         np.savetxt(
             os.path.join(output_csv_dir, nombre_base + ".csv"),
             matriz_np,
